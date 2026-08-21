@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma"
 import { Save, Building2, Phone, Mail, Clock, DollarSign } from "lucide-react"
 
+export const dynamic = 'force-dynamic'
+
 async function getCafeSettings() {
   const settings = await prisma.cafeSettings.findFirst()
   return settings

@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma"
 import { Eye, Check, X, Clock, ChefHat, Truck } from "lucide-react"
 import Link from "next/link"
 
+export const dynamic = 'force-dynamic'
+
 async function getOrders() {
   const orders = await prisma.order.findMany({
     orderBy: { createdAt: 'desc' },

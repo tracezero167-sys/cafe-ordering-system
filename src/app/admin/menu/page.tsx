@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma"
 import { Plus, Pencil, Trash2, Utensils } from "lucide-react"
 import Link from "next/link"
 
+export const dynamic = 'force-dynamic'
+
 async function getMenuData() {
   const categories = await prisma.category.findMany({
     where: { isActive: true },

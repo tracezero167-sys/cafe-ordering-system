@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma"
 import { Plus, QrCode, Users, MapPin, Download, Edit, Trash2, RefreshCw } from "lucide-react"
 import Link from "next/link"
 
+export const dynamic = 'force-dynamic'
+
 async function getTables() {
   const tables = await prisma.table.findMany({
     include: {
