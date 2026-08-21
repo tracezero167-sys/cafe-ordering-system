@@ -50,6 +50,29 @@ export default function PaymentPage() {
   const handleOnlinePayment = () => {
     setLoading(true)
     sessionStorage.setItem("paymentMethod", "ONLINE")
+    
+    // Generate WhatsApp message with bill details
+    const billMessage = `🧾 *ORDER BILL*
+━━━━━━━━━━━━━━━━━━
+👤 *Customer:* ${customerInfo.name}
+📱 *Phone:* ${customerInfo.phone}
+🪑 *Table:* ${customerInfo.tableNumber}
+━━━━━━━━━━━━━━━━━━
+📦 *ORDER ITEMS:*
+${cart.map((item, index) => `${index + 1}. ${item.name} x${item.quantity} - ₹${item.price * item.quantity}`).join('\n')}
+━━━━━━━━━━━━━━━━━━
+💰 *PAYMENT SUMMARY:*
+• Subtotal: ₹${subtotal.toFixed(2)}
+• Tax (5%): ₹${tax.toFixed(2)}
+• *TOTAL: ₹${total.toFixed(2)}*
+━━━━━━━━━━━━━━━━━━
+✅ *Payment Method:* Online (UPI)
+🙏 Thank you for your order!`
+    
+    // Open WhatsApp with the bill message
+    const whatsappUrl = `https://wa.me/91${customerInfo.phone.replace(/\D/g, '')}?text=${encodeURIComponent(billMessage)}`
+    window.open(whatsappUrl, '_blank')
+    
     router.push('/order/confirmation')
     setLoading(false)
   }
@@ -57,6 +80,29 @@ export default function PaymentPage() {
   const handleCODPayment = async () => {
     setLoading(true)
     sessionStorage.setItem("paymentMethod", "COD")
+    
+    // Generate WhatsApp message with bill details
+    const billMessage = `🧾 *ORDER BILL*
+━━━━━━━━━━━━━━━━━━
+👤 *Customer:* ${customerInfo.name}
+📱 *Phone:* ${customerInfo.phone}
+🪑 *Table:* ${customerInfo.tableNumber}
+━━━━━━━━━━━━━━━━━━
+📦 *ORDER ITEMS:*
+${cart.map((item, index) => `${index + 1}. ${item.name} x${item.quantity} - ₹${item.price * item.quantity}`).join('\n')}
+━━━━━━━━━━━━━━━━━━
+💰 *PAYMENT SUMMARY:*
+• Subtotal: ₹${subtotal.toFixed(2)}
+• Tax (5%): ₹${tax.toFixed(2)}
+• *TOTAL: ₹${total.toFixed(2)}*
+━━━━━━━━━━━━━━━━━━
+✅ *Payment Method:* Cash on Delivery
+🙏 Thank you for your order!`
+    
+    // Open WhatsApp with the bill message
+    const whatsappUrl = `https://wa.me/91${customerInfo.phone.replace(/\D/g, '')}?text=${encodeURIComponent(billMessage)}`
+    window.open(whatsappUrl, '_blank')
+    
     router.push('/order/confirmation')
     setLoading(false)
   }
