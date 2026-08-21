@@ -1,0 +1,282 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Admin users with role-based access
+model Admin {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String    // Hashed password
+  name          String
+  role          String    @default("STAFF") // SUPER_ADMIN, MANAGER, STAFF
+  isActive      Boolean   @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  auditLogs     AuditLog[]
+  orders        Order[]   // Orders managed by this admin
+
+  @@index([email])
+  @@index([role])
+}
+
+// Cafe settings
+model CafeSettings {
+  id                String   @id @default(cuid())
+  cafeName          String   @default("The Urban Bean")
+  logo              String?
+  address           String?
+  phone             String?
+  whatsappNumber    String?
+  email             String?
+  taxPercentage     Float    @default(0)
+  serviceCharge     Float    @default(0)
+  currency          String   @default("₹")
+  openingHours      String?
+  paymentGateway    String   @default("razorpay")
+  whatsappEnabled   Boolean  @default(false)
+  orderPreparationTime Int   @default(15)
+  notificationSettings String? // JSON string
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Tables in the cafe
+model Table {
+  id          String   @id @default(cuid())
+  tableNumber String   @unique
+  name        String?
+  capacity    Int      @default(4)
+  status      String   @default("AVAILABLE") // AVAILABLE, OCCUPIED, ORDERING, PREPARING, NEEDS_ATTENTION, DISABLED
+  isActive    Boolean  @default(true)
+  qrCode      String?  @unique // QR code URL
+  qrCodeImage String?  // Base64 or path to QR image
+  position    String?  // JSON string for visual table layout
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders      Order[]
+  customerSessions CustomerSession[]
+
+  @@index([tableNumber])
+  @@index([status])
+}
+
+// Categories for menu items
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  displayOrder Int      @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products    Product[]
+
+  @@index([displayOrder])
+}
+
+// Menu products
+model Product {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  image             String?
+  price             Float
+  category          Category @relation(fields: [categoryId], references: [id])
+  categoryId        String
+  foodType          String   @default("VEG") // VEG, NON_VEG, BOTH
+  availability      Boolean  @default(true)
+  preparationTime   Int      @default(15) // in minutes
+  variants          String?  // JSON string for product variants
+  addOns            String?  // JSON string for available add-ons
+  displayOrder      Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  orderItems        OrderItem[]
+
+  @@index([categoryId])
+  @@index([availability])
+  @@index([foodType])
+}
+
+// Customers
+model Customer {
+  id            String    @id @default(cuid())
+  name          String
+  whatsappNumber String   @unique
+  email         String?
+  totalOrders   Int       @default(0)
+  totalSpending Float     @default(0)
+  firstVisit    DateTime  @default(now())
+  lastVisit     DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  orders        Order[]
+  customerSessions CustomerSession[]
+
+  @@index([whatsappNumber])
+}
+
+// Customer sessions (for tracking table sessions)
+model CustomerSession {
+  id          String   @id @default(cuid())
+  customer    Customer @relation(fields: [customerId], references: [id])
+  customerId  String
+  table       Table    @relation(fields: [tableId], references: [id])
+  tableId     String
+  sessionToken String  @unique
+  isActive    Boolean  @default(true)
+  startedAt   DateTime @default(now())
+  endedAt     DateTime?
+
+  orders      Order[]
+
+  @@index([sessionToken])
+  @@index([tableId])
+  @@index([customerId])
+}
+
+// Orders
+model Order {
+  id              String   @id @default(cuid())
+  orderNumber     String   @unique
+  customer        Customer         @relation(fields: [customerId], references: [id])
+  customerId      String
+  table           Table            @relation(fields: [tableId], references: [id])
+  tableId         String
+  session         CustomerSession  @relation(fields: [sessionId], references: [id])
+  sessionId       String
+  admin           Admin?           @relation(fields: [adminId], references: [id])
+  adminId         String?
+  status          String   @default("PENDING") // PENDING, CONFIRMED, PREPARING, READY, SERVED, COMPLETED, CANCELLED
+  paymentMethod   String   // ONLINE, CASH, CARD, UPI
+  paymentStatus   String   @default("PENDING") // PENDING, PROCESSING, PAID, FAILED, REFUNDED
+  subtotal        Float
+  tax             Float    @default(0)
+  serviceCharge   Float    @default(0)
+  totalAmount     Float
+  specialInstructions String?
+  estimatedPreparationTime Int?
+  actualPreparationTime Int?
+  completedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  items           OrderItem[]
+  payment         Payment?
+  statusHistory   OrderStatusHistory[]
+
+  @@index([orderNumber])
+  @@index([customerId])
+  @@index([tableId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([createdAt])
+}
+
+// Order items
+model OrderItem {
+  id          String   @id @default(cuid())
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId     String
+  product     Product  @relation(fields: [productId], references: [id])
+  productId   String
+  quantity    Int
+  unitPrice   Float
+  selectedVariant String? // JSON string
+  selectedAddOns    String? // JSON string
+  totalPrice  Float
+  specialInstructions String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+// Payment records
+model Payment {
+  id              String   @id @default(cuid())
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId         String   @unique
+  paymentMethod   String   // ONLINE, CASH, CARD, UPI
+  amount          Float
+  currency        String   @default("INR")
+  gateway         String   @default("razorpay")
+  transactionId   String?  @unique
+  gatewayResponse String?  // JSON string
+  status          String   @default("PENDING") // PENDING, PROCESSING, PAID, FAILED, REFUNDED
+  failureReason   String?
+  paidAt          DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([transactionId])
+  @@index([status])
+}
+
+// Order status history
+model OrderStatusHistory {
+  id          String   @id @default(cuid())
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId     String
+  status      String   // PENDING, CONFIRMED, PREPARING, READY, SERVED, COMPLETED, CANCELLED
+  notes       String?
+  changedBy   String?  // Admin ID or system
+  createdAt   DateTime @default(now())
+
+  @@index([orderId])
+  @@index([createdAt])
+}
+
+// Audit logs for admin actions
+model AuditLog {
+  id          String   @id @default(cuid())
+  admin       Admin    @relation(fields: [adminId], references: [id])
+  adminId     String
+  action      String
+  entity      String
+  entityId    String?
+  changes     String?  // JSON string
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([adminId])
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+}
+
+// Notifications
+model Notification {
+  id          String   @id @default(cuid())
+  type        String   // ORDER_CONFIRMED, PAYMENT_CONFIRMED, ORDER_PREPARING, ORDER_READY, ORDER_COMPLETED, ORDER_CANCELLED
+  title       String
+  message     String
+  recipient   String?  // Customer phone or admin email
+  orderId     String?
+  status      String   @default("PENDING") // PENDING, SENT, FAILED
+  sentAt      DateTime?
+  error       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([status])
+  @@index([orderId])
+}

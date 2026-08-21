@@ -1,0 +1,11 @@
+To update the cafe name to "be lieve", you need to set up the DATABASE_URL environment variable:
+
+1. Create a file named .env in the project root with this content:
+   DATABASE_URL="file:./dev.db"
+
+2. Then run this command to update the cafe name:
+   node update-cafe-name.js
+
+Or alternatively:
+- Go to http://localhost:3000/admin/settings
+- Update the cafe name there in the admin panel
