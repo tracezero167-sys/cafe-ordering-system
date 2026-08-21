@@ -4,11 +4,12 @@ import { NextResponse } from "next/server"
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const table = await prisma.table.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!table) {
@@ -31,7 +32,7 @@ export async function GET(
 
     // Update table with QR code
     await prisma.table.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         qrCode: qrUrl,
         qrCodeImage: qrCodeDataUrl

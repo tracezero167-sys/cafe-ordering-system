@@ -3,11 +3,12 @@ import { NextResponse } from "next/server"
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await request.json()
     const { status } = body
+    const { id } = await params
 
     if (!status) {
       return NextResponse.json(
@@ -18,7 +19,7 @@ export async function PATCH(
 
     // Update order status
     const order = await prisma.order.update({
-      where: { id: params.id },
+      where: { id },
       data: { status },
       include: {
         table: true
@@ -28,7 +29,7 @@ export async function PATCH(
     // Create status history entry
     await prisma.orderStatusHistory.create({
       data: {
-        orderId: params.id,
+        orderId: id,
         status,
         notes: `Status changed to ${status}`
       }

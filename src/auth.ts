@@ -1,3 +1,3 @@
-import { auth as nextAuth } from "next-auth"
+import auth from "next-auth"
 
-export const auth = nextAuth
+export { auth }

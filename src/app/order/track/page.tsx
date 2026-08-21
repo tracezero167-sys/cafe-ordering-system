@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Clock, CheckCircle, ChefHat, Truck, Home, RefreshCw, ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-export default function OrderTrackPage() {
+function OrderTrackContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const orderId = searchParams.get("orderId")
@@ -247,5 +247,20 @@ export default function OrderTrackPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function OrderTrackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading order information...</p>
+        </div>
+      </div>
+    }>
+      <OrderTrackContent />
+    </Suspense>
   )
 }
