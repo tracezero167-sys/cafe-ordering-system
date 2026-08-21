@@ -150,11 +150,10 @@ export default async function SettingsPage() {
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">Payment Gateway</label>
             <select
-              defaultValue={settings?.paymentGateway || "razorpay"}
+              defaultValue={settings?.paymentGateway || "upi"}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="razorpay">Razorpay</option>
-              <option value="stripe">Stripe</option>
+              <option value="upi">UPI (QR Code)</option>
               <option value="cash">Cash Only</option>
             </select>
           </div>

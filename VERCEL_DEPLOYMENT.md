@@ -15,14 +15,12 @@
 DATABASE_URL                 - PostgreSQL connection string
 NEXTAUTH_SECRET             - Random 32+ character string
 NEXTAUTH_URL                - https://your-domain.vercel.app
-RAZORPAY_KEY_ID            - From Razorpay dashboard
-RAZORPAY_KEY_SECRET        - From Razorpay dashboard
-PUSHER_APP_ID              - From Pusher dashboard
-PUSHER_KEY                 - From Pusher dashboard
-PUSHER_SECRET              - From Pusher dashboard
-PUSHER_CLUSTER             - Your Pusher cluster (e.g., mt1)
-NEXT_PUBLIC_PUSHER_KEY     - Public Pusher key
-NEXT_PUBLIC_PUSHER_CLUSTER - Your Pusher cluster
+PUSHER_APP_ID              - (Optional) From Pusher dashboard
+PUSHER_KEY                 - (Optional) From Pusher dashboard
+PUSHER_SECRET              - (Optional) From Pusher dashboard
+PUSHER_CLUSTER             - (Optional) Your Pusher cluster (e.g., mt1)
+NEXT_PUBLIC_PUSHER_KEY     - (Optional) Public Pusher key
+NEXT_PUBLIC_PUSHER_CLUSTER - (Optional) Your Pusher cluster
 WHATSAPP_API_KEY           - (Optional) WhatsApp API
 WHATSAPP_PHONE_NUMBER_ID   - (Optional) WhatsApp Phone ID
 ```

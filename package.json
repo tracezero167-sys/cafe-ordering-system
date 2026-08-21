@@ -26,7 +26,6 @@
     "pusher": "^5.3.4",
     "pusher-js": "^8.6.0",
     "qrcode": "^1.5.4",
-    "razorpay": "^2.9.8",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "recharts": "^3.10.1",
