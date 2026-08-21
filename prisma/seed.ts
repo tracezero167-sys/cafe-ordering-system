@@ -27,7 +27,7 @@ async function main() {
     update: {},
     create: {
       id: 'default',
-      cafeName: 'The Urban Bean',
+      cafeName: 'be lieve',
       address: '123 Main Street, City',
       phone: '+91 9876543210',
       whatsappNumber: '+91 9876543210',
@@ -36,7 +36,7 @@ async function main() {
       serviceCharge: 2,
       currency: '₹',
       openingHours: '9:00 AM - 10:00 PM',
-      paymentGateway: 'razorpay',
+      paymentGateway: 'upi',
       whatsappEnabled: true,
       orderPreparationTime: 15,
       notificationSettings: null
